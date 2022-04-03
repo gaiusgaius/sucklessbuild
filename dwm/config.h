@@ -33,7 +33,7 @@ static const Rule rules[] = {
 	 */
 	/* class      instance    title       tags mask     isfloating   monitor */
 	{ "Gimp",     NULL,       NULL,       0,            1,           -1 },
-	{ "Firefox",  NULL,       NULL,       1 << 8,       0,           -1 },
+	{ "Firefox",  NULL,       NULL,       9,       0,           -1 },
 };
 
 /* window swallowing */
@@ -44,7 +44,7 @@ static const char swalsymbol[] = "�";
 /* layout(s) */
 static const float mfact     = 0.55; /* factor of master area size [0.05..0.95] */
 static const int nmaster     = 1;    /* number of clients in master area */
-static const int resizehints = 1;    /* 1 means respect size hints in tiled resizals */
+static const int resizehints = 0;    /* 1 means respect size hints in tiled resizals */
 static const int lockfullscreen = 1; /* 1 will force focus on the fullscreen window */
 
 #define FORCE_VSPLIT 1  /* nrowgrid layout: force two clients to always split vertically */
@@ -86,12 +86,17 @@ static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont,
 static const char *termcmd[] = { "st", NULL };
 static const char *run_lat[] = { "latexmenu", NULL };
 static const char *sitemenu[] = { "sitemenu", NULL };
+static const char *sound_plus[] = { "st -e pactl set-sink-volume 0 +100% +100%", NULL };
+static const char *upvol[]   = { "amixer", "-D",  "sset","Master", "10%+",     NULL  };
+static const char *downvol[] = { "amixer", "set", "Master", "3-",     NULL  };
+static const char *mutevol[] = { "amixer", "set", "Master", "toggle", NULL  };
+static const char *slock[] = { "slock", NULL };
 
 /* commands spawned when clicking statusbar, the mouse button pressed is exported as BUTTON */
 static const StatusCmd statuscmds[] = {
 	{ "show_plan", 1 },
     { "st -e calcurse", 2 },
-    { "", 3 },
+    { "st -e htop", 3 },
     { "", 4 },
     { "", 5 },
     { "", 6 },
@@ -110,23 +115,27 @@ static Key keys[] = {
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
 	{ MODKEY,                       XK_i,      incnmaster,     {.i = +1 } },
 	{ MODKEY,                       XK_d,      incnmaster,     {.i = -1 } },
-	{ MODKEY,                       XK_h,      spawn,          {.v = sitemenu} },
-	{ MODKEY,                       XK_l,      spawn,          {.v = run_lat} },
+	{ MODKEY,                       XK_h,      setmfact,       {.f = -0.05} },
+	{ MODKEY,                       XK_l,      setmfact,       {.f = +0.05} },
+	{ MODKEY,                       XK_s,      spawn,          {.v = sitemenu } },
+	{ MODKEY,                       XK_x,      spawn,          {.v = run_lat } },
+	{ MODKEY,                       XK_a,      spawn,          {.v = sound_plus } },
+	{ MODKEY|ShiftMask|ControlMask, XK_l,      spawn,          {.v = slock } },
 	{ MODKEY,                       XK_Return, zoom,           {0} },
-	{ MODKEY|Mod4Mask,              XK_u,      incrgaps,       {.i = +1 } },
-	{ MODKEY|Mod4Mask|ShiftMask,    XK_u,      incrgaps,       {.i = -1 } },
+	/*{ MODKEY|Mod4Mask,              XK_u,      incrgaps,       {.i = +1 } },
+	{ MODKEY|Mod4Mask|ShiftMask,    XK_u,      incrgaps,       {.i = -1 } },*/
 	{ MODKEY|Mod4Mask,              XK_i,      incrigaps,      {.i = +1 } },
 	{ MODKEY|Mod4Mask|ShiftMask,    XK_i,      incrigaps,      {.i = -1 } },
 	{ MODKEY|Mod4Mask,              XK_o,      incrogaps,      {.i = +1 } },
 	{ MODKEY|Mod4Mask|ShiftMask,    XK_o,      incrogaps,      {.i = -1 } },
-	{ MODKEY|Mod4Mask,              XK_6,      incrihgaps,     {.i = +1 } },
+	/*{ MODKEY|Mod4Mask,              XK_6,      incrihgaps,     {.i = +1 } },
 	{ MODKEY|Mod4Mask|ShiftMask,    XK_6,      incrihgaps,     {.i = -1 } },
 	{ MODKEY|Mod4Mask,              XK_7,      incrivgaps,     {.i = +1 } },
 	{ MODKEY|Mod4Mask|ShiftMask,    XK_7,      incrivgaps,     {.i = -1 } },
 	{ MODKEY|Mod4Mask,              XK_8,      incrohgaps,     {.i = +1 } },
 	{ MODKEY|Mod4Mask|ShiftMask,    XK_8,      incrohgaps,     {.i = -1 } },
 	{ MODKEY|Mod4Mask,              XK_9,      incrovgaps,     {.i = +1 } },
-	{ MODKEY|Mod4Mask|ShiftMask,    XK_9,      incrovgaps,     {.i = -1 } },
+	{ MODKEY|Mod4Mask|ShiftMask,    XK_9,      incrovgaps,     {.i = -1 } },*/
 	{ MODKEY|Mod4Mask,              XK_0,      togglegaps,     {0} },
 	{ MODKEY|Mod4Mask|ShiftMask,    XK_0,      defaultgaps,    {0} },
 	{ MODKEY,                       XK_Tab,    view,           {0} },
@@ -156,6 +165,9 @@ static Key keys[] = {
 	{ MODKEY|ShiftMask,             XK_minus, scratchpad_hide, {0} },
 	{ MODKEY,                       XK_equal,scratchpad_remove,{0} },
 	{ MODKEY|ShiftMask,             XK_q,      quit,           {0} },
+    { MODKEY,                       XK_m,    spawn,          {.v = upvol   }  },
+    { MODKEY,                       XK_F6,    spawn,          {.v = downvol }  },
+    { MODKEY,                       XK_F4,     spawn,         {.v = mutevol }  },
 };
 
 /* button definitions */
