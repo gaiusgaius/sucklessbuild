@@ -87,9 +87,10 @@ static const char *termcmd[] = { "st", NULL };
 static const char *run_lat[] = { "latexmenu", NULL };
 static const char *sitemenu[] = { "sitemenu", NULL };
 static const char *books[] = { "recent_book", NULL };
-static const char *upvol[]   = { "upvol", NULL  };
-static const char *downvol[] = { "downvol", NULL  };
-static const char *mutevol[] = { "amixer", "set", "Master", "toggle", NULL  };
+static const char *movies[] = { "movies", NULL };
+//static const char *upvol[]   = { "upvol", NULL  };
+//static const char *downvol[] = { "downvol", NULL  };
+//static const char *mutevol[] = { "amixer", "set", "Master", "toggle", NULL  };
 static const char *slock[] = { "slock", NULL };
 
 /* commands spawned when clicking statusbar, the mouse button pressed is exported as BUTTON */
@@ -106,8 +107,40 @@ static const StatusCmd statuscmds[] = {
 };
 static const char *statuscmd[] = { "/bin/sh", "-c", NULL, NULL };
 
+
+/**
+ *  * dwmconfig.h 
+ *   * Hardware multimedia keys
+ *    */
+/* Somewhere at the beginning of config.h include: */
+
+/* 
+ *  You obviously need the X11 development packages installed, X11proto in particular, but 
+ *   here is the location of the upstream copy of the keysyms header if you can't bother 
+ *    using the contents  of your own hard drive. ;-P
+ *     
+ *      https://cgit.freedesktop.org/xorg/proto/x11proto/tree/XF86keysym.h
+ *      */
+
+#include <X11/XF86keysym.h>
+
+/* Add somewhere in your constants definition section */
+
+static const char *upvol[]   = { "/usr/bin/pactl", "set-sink-volume", "0", "+5%", "pkill -RTMIN+10 dwmblocks",     NULL  };
+static const char *downvol[] = { "/usr/bin/pactl", "set-sink-volume", "0", "-5%",     NULL  };
+static const char *mutevol[] = { "/usr/bin/pactl", "set-sink-mute",   "0", "toggle",  NULL  };
+static const char *upbright[] = { "light", "-A",   "5", NULL  };
+static const char *downbright[] = { "light", "-U",   "5", NULL  };
+
+/* Add to keys[] array. With 0 as modifier, you are able to use the keys directly. */
+
 static Key keys[] = {
 	/* modifier                     key        function        argument */
+    { 0,        XF86XK_AudioLowerVolume,        spawn,         SHCMD("pactl set-sink-volume 0 -5%; pkill -RTMIN+10 dwmblocks")},
+    { 0,        XF86XK_AudioMute,               spawn,         {.v = mutevol} },
+    { 0,        XF86XK_AudioRaiseVolume,        spawn,         SHCMD("pactl set-sink-volume 0 +5%; pkill -RTMIN+10 dwmblocks")},
+    { 0,        XF86XK_MonBrightnessUp,        spawn,          {.v = upbright   }  },
+    { 0,        XF86XK_MonBrightnessDown,        spawn,          {.v = downbright   }  },
 	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
 	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },
 	{ MODKEY,                       XK_b,      togglebar,      {0} },
@@ -120,6 +153,8 @@ static Key keys[] = {
 	{ MODKEY,                       XK_s,      spawn,          {.v = sitemenu } },
 	{ MODKEY,                       XK_x,      spawn,          {.v = run_lat } },
 	{ MODKEY,                       XK_r,      spawn,          {.v = books } },
+	{ MODKEY,                       XK_m,      spawn,          {.v = movies } },
+	{ MODKEY,                       XK_c,      spawn,          {.v = "st -e cmus" } },
 	{ MODKEY|ShiftMask|ControlMask, XK_l,      spawn,          {.v = slock } },
 	{ MODKEY,                       XK_Return, zoom,           {0} },
 	/*{ MODKEY|Mod4Mask,              XK_u,      incrgaps,       {.i = +1 } },
@@ -142,7 +177,6 @@ static Key keys[] = {
 	{ MODKEY|ShiftMask,             XK_c,      killclient,     {0} },
 	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} },
 	{ MODKEY,                       XK_f,      setlayout,      {.v = &layouts[1]} },
-	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} },
 	{ MODKEY,                       XK_space,  setlayout,      {0} },
 	{ MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },
 	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },
@@ -165,9 +199,6 @@ static Key keys[] = {
 	{ MODKEY|ShiftMask,             XK_minus, scratchpad_hide, {0} },
 	{ MODKEY,                       XK_equal,scratchpad_remove,{0} },
 	{ MODKEY|ShiftMask,             XK_q,      quit,           {0} },
-    { MODKEY,                       XK_F6,          spawn,          {.v = upvol   }  },
-    { MODKEY,                       XK_F5,          spawn,          {.v = downvol }  },
-    { MODKEY,                       XK_F4,     spawn,         {.v = mutevol }  },
     //{                               XK_AudioRaiseVolume, spawn, {.v = sound_plus} }
 };
 
