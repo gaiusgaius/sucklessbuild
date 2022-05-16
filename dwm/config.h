@@ -16,7 +16,7 @@ static const char col_gray1[]       = "#222222";
 static const char col_gray2[]       = "#444444";
 static const char col_gray3[]       = "#bbbbbb";
 static const char col_gray4[]       = "#eeeeee";
-static const char col_cyan[]        = /*"#005577";*/ "#98971a";
+static const char col_cyan[]        = /*"#005577";*/ /*Green*//*"#98971a";*/ "#83a598";
 static const char *colors[][3]      = {
 	/*               fg         bg         border   */
 	[SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
@@ -75,7 +75,9 @@ static const Layout layouts[] = {
 	{ MODKEY,                       KEY,      view,           {.ui = 1 << TAG} }, \
 	{ MODKEY|ControlMask,           KEY,      toggleview,     {.ui = 1 << TAG} }, \
 	{ MODKEY|ShiftMask,             KEY,      tag,            {.ui = 1 << TAG} }, \
-	{ MODKEY|ControlMask|ShiftMask, KEY,      toggletag,      {.ui = 1 << TAG} },
+	{ MODKEY|ControlMask|ShiftMask, KEY,      toggletag,      {.ui = 1 << TAG} }, \
+        { Mod4Mask,                       KEY,      focusnthmon,    {.i  = TAG } }, \
+        { Mod4Mask|ShiftMask,             KEY,      tagnthmon,      {.i  = TAG } },
 
 /* helper for spawning shell commands in the pre dwm-5.0 fashion */
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/bash", "-c", cmd, NULL } }
@@ -84,7 +86,7 @@ static const Layout layouts[] = {
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
 static const char *termcmd[] = { "st", NULL };
-static const char *run_lat[] = { "latexmenu", NULL };
+static const char *run_lat[] = { "wrapper_for_latexmenu", NULL };
 static const char *sitemenu[] = { "sitemenu", NULL };
 static const char *books[] = { "recent_book", NULL };
 static const char *movies[] = { "movies", NULL };
@@ -199,7 +201,13 @@ static Key keys[] = {
 	{ MODKEY|ShiftMask,             XK_minus, scratchpad_hide, {0} },
 	{ MODKEY,                       XK_equal,scratchpad_remove,{0} },
 	{ MODKEY|ShiftMask,             XK_q,      quit,           {0} },
+    { MODKEY|ControlMask,           XK_comma,  cyclelayout,    {.i = -1 }  },
+    { MODKEY|ControlMask,           XK_period, cyclelayout,    {.i = +1 }  },
     //{                               XK_AudioRaiseVolume, spawn, {.v = sound_plus} }
+    { Mod4Mask,                       XK_m,      focusnthmon,    {.i  = +1 } }, \
+    { Mod4Mask|ShiftMask,             XK_m,      focusnthmon,    {.i  = -1 } }, \
+    { Mod4Mask|ShiftMask,             XK_n,      tagnthmon,      {.i  = +1 } },
+    { Mod4Mask|ShiftMask|ControlMask,             XK_n,      tagnthmon,      {.i  = -1 } },
 };
 
 /* button definitions */
